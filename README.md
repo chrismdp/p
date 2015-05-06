@@ -12,7 +12,7 @@ $ p wait
 ...
 Done
 
-$ p reset
+$ p cancel
 Pomodoro cancelled
 
 $ cat ~/.p
