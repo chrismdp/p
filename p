@@ -2,12 +2,14 @@
 
 set -exv
 
-LOG=$HOME/.p
+LOG=$HOME/.p.log
 DATE_FORMAT="%Y-%m-%d %T %z"
 POMODORO_LENGTH_IN_SECONDS=1500
 POMODORO_BREAK_IN_SECONDS=300
 PREFIX="🍅 "
 TMPFILE=/tmp/p-${RANDOM}
+INTERNAL_INTERRUPTION_MARKER="'"
+EXTERNAL_INTERRUPTION_MARKER="-"
 
 function deleteLastLine
 {
@@ -23,6 +25,7 @@ function checkLastPomodoro
     RECENT=$(tail -1 ${LOG})
     TIME=$(echo $RECENT | cut -d ',' -f 1)
     THING=$(echo $RECENT | cut -d ',' -f 3-)
+    INTERRUPTIONS=$(echo $RECENT | cut -d ',' -f 2)
 
     TIMESTAMP_RECENT=$(date -j -f "$DATE_FORMAT" "$TIME" "+%s")
     TIMESTAMP_NOW=$(date "+%s")
@@ -39,6 +42,20 @@ function cancelRunningPomodoro
   if [ -z $POMODORO_FINISHED ]; then
     deleteLastLine
   fi
+  echo "Cancelled. Don't worry: the next Pomodoro will go better!"
+}
+
+function interrupt
+{
+  type=$1
+  checkLastPomodoro
+  if [ -z $POMODORO_FINISHED ]; then
+    deleteLastLine
+    echo $TIME,$INTERRUPTIONS$type,$THING >> $LOG
+  else
+    echo "No pomodoro to interrupt"
+    exit 1
+  fi
 }
 
 case "$1" in
@@ -49,6 +66,12 @@ case "$1" in
     ;;
   cancel)
     cancelRunningPomodoro
+    ;;
+  i)
+    interrupt $INTERNAL_INTERRUPTION_MARKER
+    ;;
+  e)
+    interrupt $EXTERNAL_INTERRUPTION_MARKER
     ;;
   *)
     checkLastPomodoro
