@@ -13,15 +13,15 @@ EXTERNAL_INTERRUPTION_MARKER="-"
 
 function deleteLastLine
 {
-  if [ ! -z $LOG ]; then
-    sed '$ d' $LOG > $TMPFILE
-    mv $TMPFILE $LOG
+  if [ -s "$LOG" ]; then
+    sed '$ d' "$LOG" > $TMPFILE
+    mv $TMPFILE "$LOG"
   fi
 }
 
 function checkLastPomodoro
 {
-  if [ ! -z $LOG ]; then
+  if [ -s "$LOG" ]; then
     RECENT=$(tail -1 ${LOG})
     TIME=$(echo $RECENT | cut -d ',' -f 1)
     THING=$(echo $RECENT | cut -d ',' -f 3-)
@@ -33,6 +33,8 @@ function checkLastPomodoro
     if (( $SECONDS_ELAPSED > $POMODORO_LENGTH_IN_SECONDS )); then
       POMODORO_FINISHED=1
     fi
+  else
+    NO_RECORDS=1
   fi
 }
 
@@ -42,7 +44,6 @@ function cancelRunningPomodoro
   if [ -z $POMODORO_FINISHED ]; then
     deleteLastLine
   fi
-  echo "Cancelled. Don't worry: the next Pomodoro will go better!"
 }
 
 function interrupt
@@ -51,7 +52,7 @@ function interrupt
   checkLastPomodoro
   if [ -z $POMODORO_FINISHED ]; then
     deleteLastLine
-    echo $TIME,$INTERRUPTIONS$type,$THING >> $LOG
+    echo $TIME,$INTERRUPTIONS$type,$THING >> "$LOG"
   else
     echo "No pomodoro to interrupt"
     exit 1
@@ -62,10 +63,11 @@ case "$1" in
   start)
     cancelRunningPomodoro
     NOW=$(date +"$DATE_FORMAT")
-    echo $NOW,,${*:2} >> $LOG
+    echo $NOW,,${*:2} >> "$LOG"
     ;;
   cancel)
     cancelRunningPomodoro
+    echo "Cancelled. Don't worry: the next Pomodoro will go better!"
     ;;
   i)
     interrupt $INTERNAL_INTERRUPTION_MARKER
@@ -73,23 +75,37 @@ case "$1" in
   e)
     interrupt $EXTERNAL_INTERRUPTION_MARKER
     ;;
-  *)
-    checkLastPomodoro
-    if (( $SECONDS_ELAPSED > $POMODORO_LENGTH_IN_SECONDS )); then
-      BREAK=$((SECONDS_ELAPSED - POMODORO_LENGTH_IN_SECONDS))
-      if (( $BREAK < $POMODORO_BREAK_IN_SECONDS )); then
-        MIN=$((BREAK / 60))
-        SEC=$((BREAK % 60))
-        BREAKTIME=". Break ${MIN}m ${SEC}s."
-      fi
-      echo "$PREFIX Done$BREAKTIME"
-    else
+  wait)
+    while [ -z $POMODORO_FINISHED ]; do
+      checkLastPomodoro
       MIN=$((SECONDS_ELAPSED / 60))
       SEC=$((SECONDS_ELAPSED % 60))
       if [ ! -z "$THING" ]; then
         ON_THING=" on \"$THING\""
       fi
-      echo "$PREFIX ${MIN}m ${SEC}s$ON_THING"
+      printf "\r$PREFIX ${MIN}m ${SEC}s$ON_THING"
+      sleep 1
+    done
+    ;;
+  *)
+    checkLastPomodoro
+    if [ -z $NO_RECORDS ]; then
+      if [ ! -z $POMODORO_FINISHED ]; then
+        BREAK=$((SECONDS_ELAPSED - POMODORO_LENGTH_IN_SECONDS))
+        if (( $BREAK < $POMODORO_BREAK_IN_SECONDS )); then
+          MIN=$((BREAK / 60))
+          SEC=$((BREAK % 60))
+          BREAKTIME=". Break ${MIN}m ${SEC}s."
+        fi
+        echo "$PREFIX Done$BREAKTIME"
+      else
+        MIN=$((SECONDS_ELAPSED / 60))
+        SEC=$((SECONDS_ELAPSED % 60))
+        if [ ! -z "$THING" ]; then
+          ON_THING=" on \"$THING\""
+        fi
+        echo "$PREFIX ${MIN}m ${SEC}s$ON_THING"
+      fi
     fi
     ;;
 esac
