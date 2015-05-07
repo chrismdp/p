@@ -10,6 +10,7 @@ PREFIX="🍅 "
 TMPFILE=/tmp/p-${RANDOM}
 INTERNAL_INTERRUPTION_MARKER="'"
 EXTERNAL_INTERRUPTION_MARKER="-"
+DATE=date
 
 function deleteLastLine
 {
@@ -27,8 +28,8 @@ function checkLastPomodoro
     THING=$(echo $RECENT | cut -d ',' -f 3-)
     INTERRUPTIONS=$(echo $RECENT | cut -d ',' -f 2)
 
-    TIMESTAMP_RECENT=$(date -j -f "$DATE_FORMAT" "$TIME" "+%s")
-    TIMESTAMP_NOW=$(date "+%s")
+    TIMESTAMP_RECENT=$($DATE -j -f "$DATE_FORMAT" "$TIME" "+%s")
+    TIMESTAMP_NOW=$($DATE "+%s")
     SECONDS_ELAPSED=$((TIMESTAMP_NOW - TIMESTAMP_RECENT))
     if (( $SECONDS_ELAPSED >= $POMODORO_LENGTH_IN_SECONDS )); then
       POMODORO_FINISHED=1
@@ -68,10 +69,11 @@ function optionalDescription
   fi
 }
 
+
 case "$1" in
   start | s)
     cancelRunningPomodoro
-    NOW=$(date +"$DATE_FORMAT")
+    NOW=$($DATE +"$DATE_FORMAT")
     echo $NOW,,${*:2} >> "$LOG"
     optionalDescription "${*:2}"
     echo "Pomodoro started$ON_THING"
@@ -131,7 +133,7 @@ case "$1" in
           optionalDescription "${THING}"
           echo "$PREFIX Completed ${MIN}m ${SEC}s ago$ON_THING"
         else
-          LAST=$(date -j -f "$DATE_FORMAT" "$TIME" "+%a, %d %b %Y %T")
+          LAST=$($DATE -j -f "$DATE_FORMAT" "$TIME" "+%a, %d %b %Y %T")
           echo "Most recent pomodoro: $LAST"
         fi
       else
