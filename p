@@ -4,7 +4,7 @@ set -e
 
 LOG=$HOME/.p.log
 DATE_FORMAT="%Y-%m-%d %T %z"
-POMODORO_LENGTH_IN_SECONDS=610
+POMODORO_LENGTH_IN_SECONDS=1500
 POMODORO_BREAK_IN_SECONDS=300
 PREFIX="🍅 "
 TMPFILE=/tmp/p-${RANDOM}
@@ -128,9 +128,12 @@ case "$1" in
         if (( $BREAK < $POMODORO_BREAK_IN_SECONDS )); then
           MIN=$((BREAK / 60))
           SEC=$((BREAK % 60))
-          BREAKTIME=". Break ${MIN}m ${SEC}s."
+          optionalDescription "${THING}"
+          echo "$PREFIX Completed ${MIN}m ${SEC}s ago$ON_THING"
+        else
+          LAST=$(date -j -f "$DATE_FORMAT" "$TIME" "+%a, %d %b %Y %T")
+          echo "Most recent pomodoro: $LAST"
         fi
-        echo "$PREFIX Done$BREAKTIME"
       else
         MIN=$((SECONDS_ELAPSED / 60))
         SEC=$((SECONDS_ELAPSED % 60))
