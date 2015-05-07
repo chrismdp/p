@@ -40,11 +40,11 @@ To play a ringing sound (or do any other action) at the end of a pomodoro use a 
 
 ```
 $ p wait && afplay ring.wav
-🍅 1m on "Doing stuff"
+🍅 0m 0s on "Doing stuff"
 
 # (Time passes)
 
-🍅 1m on "Doing stuff" completed. Well done!
+🍅 25m 0s on "Doing stuff" completed. Well done!
 
 ```
 
