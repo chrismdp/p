@@ -20,6 +20,18 @@ function deleteLastLine
   fi
 }
 
+function convertTimeFormat
+{
+  TIME_STRING="$1"
+  OUPUT_FORMAT="$2"
+  date --version | grep "GNU coreutils" > /dev/null
+  if [ "$?" == "0" ]; then
+    date -d "$TIME_STRING" "$OUPUT_FORMAT"
+  else
+    date -j -f "$DATE_FORMAT" "$TIME_STRING" "$OUPUT_FORMAT"
+  fi
+}
+
 function checkLastPomodoro
 {
   if [ -s "$LOG" ]; then
@@ -28,7 +40,7 @@ function checkLastPomodoro
     THING=$(echo $RECENT | cut -d ',' -f 3-)
     INTERRUPTIONS=$(echo $RECENT | cut -d ',' -f 2)
 
-    TIMESTAMP_RECENT=$($DATE -j -f "$DATE_FORMAT" "$TIME" "+%s")
+    TIMESTAMP_RECENT=$(convertTimeFormat "$TIME" "+%s")
     TIMESTAMP_NOW=$($DATE "+%s")
     SECONDS_ELAPSED=$((TIMESTAMP_NOW - TIMESTAMP_RECENT))
     if (( $SECONDS_ELAPSED >= $POMODORO_LENGTH_IN_SECONDS )); then
@@ -135,7 +147,7 @@ case "$1" in
           optionalDescription "${THING}"
           echo "$PREFIX Completed ${MIN}m ${SEC}s ago$ON_THING"
         else
-          LAST=$($DATE -j -f "$DATE_FORMAT" "$TIME" "+%a, %d %b %Y %T")
+          LAST=$(convertTimeFormat "$TIME" "+%a, %d %b %Y %T")
           echo "Most recent pomodoro: $LAST"
         fi
       else
