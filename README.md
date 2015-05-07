@@ -1,4 +1,4 @@
-# `p`: the simplest pomodoro tool ever
+# `p` is the simplest pomodoro tool ever
 
 `p` uses a simple tracking log file (`~/.p.log` by default) to keep track of your pomodoros and record simple statistics. It's less than 150 lines of pure Shell.
 
