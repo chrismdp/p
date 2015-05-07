@@ -1,6 +1,6 @@
-# `p` is the simplest pomodoro tool ever
+# `p` is for people who find that other pomodoro tools slow them down.
 
-`p` uses a simple tracking log file (`~/.p.log` by default) to keep track of your pomodoros and record simple statistics. It's less than 150 lines of pure Shell.
+`p` is the fastest pomodoro tool you've ever used. It uses a simple tracking log file (`~/.p.log` by default) to keep track of your pomodoros and record simple statistics. It's less than 150 lines of pure Shell.
 
 For more information on the pomodoro technique see http://pomodorotechnique.com.
 
