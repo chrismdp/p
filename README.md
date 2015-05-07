@@ -1,6 +1,6 @@
 # `p`: the simplest pomodoro tool ever
 
-`p` uses a simple tracking log file (`~/.p.log` by default) to keep track of your pomodoros and record simple statistics. It's less than 150 lines of Shell script.
+`p` uses a simple tracking log file (`~/.p.log` by default) to keep track of your pomodoros and record simple statistics. It's less than 150 lines of pure shell script.
 
 For more information on the pomodoro technique see http://pomodorotechnique.com.
 
@@ -39,12 +39,12 @@ Cancelled. Don't worry: the next Pomodoro will go better!
 To play a ringing sound (or do any other action) at the end of a pomodoro use a command such as this:
 
 ``` bash
-$ p wait && afplay ring.wave
+$ p wait && afplay ring.wav
 🍅 1m on "Doing stuff"
 
-(Time passes)
+# (Time passes)
 
-🍅 1m on "Doing stuff" completed
+🍅 1m on "Doing stuff" completed. Well done!
 
 ```
 
