@@ -37,11 +37,12 @@ Cancelled. Don't worry: the next Pomodoro will go better!
 To play a ringing sound (or do any other action) at the end of a pomodoro use a command such as this:
 
 ``` bash
-$ p wait | afplay ring.wave
+$ p wait && afplay ring.wave
+🍅  1m on "Doing stuff"
 
 (Time passes)
 
-🍅  Done
+🍅  1m on "Doing stuff" completed
 
 ```
 

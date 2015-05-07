@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-set -exv
+set -e
 
 LOG=$HOME/.p.log
 DATE_FORMAT="%Y-%m-%d %T %z"
-POMODORO_LENGTH_IN_SECONDS=1500
+POMODORO_LENGTH_IN_SECONDS=610
 POMODORO_BREAK_IN_SECONDS=300
 PREFIX="🍅 "
 TMPFILE=/tmp/p-${RANDOM}
@@ -30,7 +30,7 @@ function checkLastPomodoro
     TIMESTAMP_RECENT=$(date -j -f "$DATE_FORMAT" "$TIME" "+%s")
     TIMESTAMP_NOW=$(date "+%s")
     SECONDS_ELAPSED=$((TIMESTAMP_NOW - TIMESTAMP_RECENT))
-    if (( $SECONDS_ELAPSED > $POMODORO_LENGTH_IN_SECONDS )); then
+    if (( $SECONDS_ELAPSED >= $POMODORO_LENGTH_IN_SECONDS )); then
       POMODORO_FINISHED=1
     fi
   else
@@ -76,16 +76,20 @@ case "$1" in
     interrupt $EXTERNAL_INTERRUPTION_MARKER
     ;;
   wait)
-    while [ -z $POMODORO_FINISHED ]; do
-      checkLastPomodoro
-      MIN=$((SECONDS_ELAPSED / 60))
-      SEC=$((SECONDS_ELAPSED % 60))
-      if [ ! -z "$THING" ]; then
-        ON_THING=" on \"$THING\""
-      fi
-      printf "\r$PREFIX ${MIN}m ${SEC}s$ON_THING"
-      sleep 1
-    done
+    checkLastPomodoro
+    if [ -z $POMODORO_FINISHED ]; then
+      while [ -z $POMODORO_FINISHED ]; do
+        MIN=$((SECONDS_ELAPSED / 60))
+        SEC=$((SECONDS_ELAPSED % 60))
+        if [ ! -z "$THING" ]; then
+          ON_THING=" on \"$THING\""
+        fi
+        printf "\r$PREFIX ${MIN}m ${SEC}s$ON_THING "
+        sleep 1
+        checkLastPomodoro
+      done
+      echo " completed. Well done!"
+    fi
     ;;
   *)
     checkLastPomodoro
