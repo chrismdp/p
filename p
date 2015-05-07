@@ -115,7 +115,7 @@ case "$1" in
     echo "   start [description] Starts a new pomodoro, cancelling any in progress"
     echo "   cancel              Cancels any pomodoro in progress"
     echo "   internal            Records an internal interruption on current pomodoro"
-    echo "   internal            Records an external interruption on current pomodoro"
+    echo "   external            Records an external interruption on current pomodoro"
     echo "   wait                Prints ticking counter and blocks until pomodoro completion"
     echo "   log                 Shows pomodoro log output in CSV format"
     echo "   help                Prints this help text"
