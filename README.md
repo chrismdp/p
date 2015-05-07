@@ -62,3 +62,7 @@ It should be possible to do some quite interesting statistical analysis. If you 
 ## Limitations
 
 It currently relies on `date` supporting the `-j` option, which may or may not work with your version of `date`. Compatibility patches are welcome, with the aim of supporting as many platforms as possible with the same script.
+
+## Credits
+
+Chris Parsons - http://chrismdp.com
