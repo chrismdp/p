@@ -17,28 +17,28 @@ chmod +x ~/bin/p
 
 To start a pomodoro:
 
-``` bash
+```
 $ p start Doing stuff
 Pomodoro started on "Doing stuff"
 ```
 
 To check what we're currently doing, just type `p status` (or just `p` with no arguments):
 
-``` bash
+```
 $ p
 🍅 1m on "Doing stuff"
 ```
 
 To cancel a pomodoro:
 
-``` bash
+```
 $ p cancel
 Cancelled. Don't worry: the next Pomodoro will go better!
 ```
 
 To play a ringing sound (or do any other action) at the end of a pomodoro use a command such as this:
 
-``` bash
+```
 $ p wait && afplay ring.wav
 🍅 1m on "Doing stuff"
 
@@ -51,7 +51,7 @@ $ p wait && afplay ring.wav
 To look at your basic stats, type `p log` or have a look at your `~/.p.log` file. It's in a simple CSV format: 
 
 ```
-$ cat ~/.p
+$ p log
 
 2015-05-06 10:04:20 +0100,'''-',Doing stuff
 2015-05-06 10:35:20 +0100,',Doing more stuff
