@@ -53,37 +53,46 @@ function interrupt
   if [ -z $POMODORO_FINISHED ]; then
     deleteLastLine
     echo $TIME,$INTERRUPTIONS$type,$THING >> "$LOG"
+    echo "Interrupt recorded"
   else
     echo "No pomodoro to interrupt"
     exit 1
   fi
 }
 
+function optionalDescription
+{
+  OPTIONAL_THING="$1"
+  if [ ! -z "${OPTIONAL_THING}" ]; then
+    ON_THING=" on \"${OPTIONAL_THING}\""
+  fi
+}
+
 case "$1" in
-  start)
+  start | s)
     cancelRunningPomodoro
     NOW=$(date +"$DATE_FORMAT")
     echo $NOW,,${*:2} >> "$LOG"
+    optionalDescription "${*:2}"
+    echo "Pomodoro started$ON_THING"
     ;;
-  cancel)
+  cancel | c)
     cancelRunningPomodoro
-    echo "Cancelled. Don't worry: the next Pomodoro will go better!"
+    echo "Cancelled. The next Pomodoro will go better!"
     ;;
-  i)
+  internal | i)
     interrupt $INTERNAL_INTERRUPTION_MARKER
     ;;
-  e)
+  external | e)
     interrupt $EXTERNAL_INTERRUPTION_MARKER
     ;;
-  wait)
+  wait | w)
     checkLastPomodoro
     if [ -z $POMODORO_FINISHED ]; then
       while [ -z $POMODORO_FINISHED ]; do
         MIN=$((SECONDS_ELAPSED / 60))
         SEC=$((SECONDS_ELAPSED % 60))
-        if [ ! -z "$THING" ]; then
-          ON_THING=" on \"$THING\""
-        fi
+        optionalDescription "${THING}"
         printf "\r$PREFIX ${MIN}m ${SEC}s$ON_THING "
         sleep 1
         checkLastPomodoro
@@ -91,7 +100,27 @@ case "$1" in
       echo " completed. Well done!"
     fi
     ;;
-  *)
+  log | l)
+    cat "$LOG"
+    ;;
+  help | h | -h)
+    echo "usage: p [command]"
+    echo
+    echo "Available commands:"
+    echo "   status (default)    Shows information about the current pomodoro"
+    echo "   start [description] Starts a new pomodoro, cancelling any in progress"
+    echo "   cancel              Cancels any pomodoro in progress"
+    echo "   internal            Records an internal interruption on current pomodoro"
+    echo "   internal            Records an external interruption on current pomodoro"
+    echo "   wait                Prints ticking counter and blocks until pomodoro completion"
+    echo "   log                 Shows pomodoro log output in CSV format"
+    echo "   help                Prints this help text"
+    echo
+    echo "Commands may be shortened to their first letter. For more information"
+    echo "see http://github.com/chrismdp/p."
+    echo
+    ;;
+  status | *)
     checkLastPomodoro
     if [ -z $NO_RECORDS ]; then
       if [ ! -z $POMODORO_FINISHED ]; then
@@ -105,9 +134,7 @@ case "$1" in
       else
         MIN=$((SECONDS_ELAPSED / 60))
         SEC=$((SECONDS_ELAPSED % 60))
-        if [ ! -z "$THING" ]; then
-          ON_THING=" on \"$THING\""
-        fi
+        optionalDescription "${THING}"
         echo "$PREFIX ${MIN}m ${SEC}s$ON_THING"
       fi
     fi
