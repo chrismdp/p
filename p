@@ -43,7 +43,10 @@ function cancelRunningPomodoro
 {
   checkLastPomodoro
   if [ -z $POMODORO_FINISHED ]; then
-    deleteLastLine
+    if [ -z $NO_RECORDS ]; then
+      deleteLastLine
+      echo $1
+    fi
   fi
 }
 
@@ -72,15 +75,14 @@ function optionalDescription
 
 case "$1" in
   start | s)
-    cancelRunningPomodoro
+    cancelRunningPomodoro "Last Pomodoro cancelled"
     NOW=$($DATE +"$DATE_FORMAT")
     echo $NOW,,${*:2} >> "$LOG"
     optionalDescription "${*:2}"
     echo "Pomodoro started$ON_THING"
     ;;
   cancel | c)
-    cancelRunningPomodoro
-    echo "Cancelled. The next Pomodoro will go better!"
+    cancelRunningPomodoro "Cancelled. The next Pomodoro will go better!"
     ;;
   internal | i)
     interrupt $INTERNAL_INTERRUPTION_MARKER
