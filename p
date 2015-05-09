@@ -24,11 +24,11 @@ function convertTimeFormat
 {
   TIME_STRING="$1"
   OUPUT_FORMAT="$2"
-  date --version 2>&1 | grep "GNU coreutils" > /dev/null
+  $DATE --version 2>&1 | grep "GNU coreutils" > /dev/null
   if [ "$?" == "0" ]; then
-    date -d "$TIME_STRING" "$OUPUT_FORMAT"
+    $DATE -d "$TIME_STRING" "$OUPUT_FORMAT"
   else
-    date -j -f "$DATE_FORMAT" "$TIME_STRING" "$OUPUT_FORMAT"
+    $DATE -j -f "$DATE_FORMAT" "$TIME_STRING" "$OUPUT_FORMAT"
   fi
 }
 
