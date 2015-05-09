@@ -24,7 +24,7 @@ function convertTimeFormat
 {
   TIME_STRING="$1"
   OUPUT_FORMAT="$2"
-  date --version | grep "GNU coreutils" > /dev/null
+  date --version 2>&1 | grep "GNU coreutils" > /dev/null
   if [ "$?" == "0" ]; then
     date -d "$TIME_STRING" "$OUPUT_FORMAT"
   else
