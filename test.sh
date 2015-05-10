@@ -75,6 +75,6 @@ Interrupt recorded
 
 [ $? -eq 0 ] || fail
 
-checkLog ",''-,"
+checkLog ",'-,"
 
 teardown
