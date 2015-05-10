@@ -30,7 +30,7 @@ To check what we're currently doing, just type `p status` (or just `p` with no a
 
 ```
 $ p
-🍅 1m on "Doing stuff"
+🍅 24:34 on "Doing stuff"
 ```
 
 To cancel a pomodoro:
@@ -44,11 +44,11 @@ To play a ringing sound (or do any other action) at the end of a pomodoro use a 
 
 ```
 $ p wait && afplay ring.wav
-🍅 0m 0s on "Doing stuff"
+🍅 24:21 on "Doing stuff"
 
 # (Time passes)
 
-🍅 25m 0s on "Doing stuff" completed. Well done!
+🍅 00:00 on "Doing stuff" completed. Well done!
 
 ```
 
