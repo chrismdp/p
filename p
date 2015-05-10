@@ -12,6 +12,8 @@ INTERNAL_INTERRUPTION_MARKER="'"
 EXTERNAL_INTERRUPTION_MARKER="-"
 DATE=date
 
+. lib/time_formatting
+
 function deleteLastLine
 {
   if [ -s "$LOG" ]; then
@@ -24,8 +26,8 @@ function convertTimeFormat
 {
   TIME_STRING="$1"
   OUPUT_FORMAT="$2"
-  $DATE --version 2>&1 | grep "GNU coreutils" > /dev/null
-  if [ "$?" == "0" ]; then
+  if gnu_date?
+  then
     $DATE -d "$TIME_STRING" "$OUPUT_FORMAT"
   else
     $DATE -j -f "$DATE_FORMAT" "$TIME_STRING" "$OUPUT_FORMAT"
