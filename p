@@ -23,12 +23,12 @@ function deleteLastLine
 function convertTimeFormat
 {
   TIME_STRING="$1"
-  OUPUT_FORMAT="$2"
+  OUTPUT_FORMAT="$2"
   $DATE --version 2>&1 | grep "GNU coreutils" > /dev/null
   if [ "$?" == "0" ]; then
-    $DATE -d "$TIME_STRING" "$OUPUT_FORMAT"
+    $DATE -d "$TIME_STRING" "$OUTPUT_FORMAT"
   else
-    $DATE -j -f "$DATE_FORMAT" "$TIME_STRING" "$OUPUT_FORMAT"
+    $DATE -j -f "$DATE_FORMAT" "$TIME_STRING" "$OUTPUT_FORMAT"
   fi
 }
 
