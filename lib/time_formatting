@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+gnu_date?() {
+  DATE="${DATE:-date}"
+
+  [[ $($DATE --version 2>&1) =~ GNU.coreutils ]]
+}
