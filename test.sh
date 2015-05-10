@@ -75,6 +75,11 @@ Interrupt recorded
 
 [ $? -eq 0 ] || fail
 
-checkLog ",'-,"
+checkLog ",''-,"
+
+run 'p log'
+
+diff -u $OUTPUT $LOGFILE
+[ $? -eq 0 ] || fail
 
 teardown
