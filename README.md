@@ -1,5 +1,7 @@
 # `p` is for people who find that other pomodoro tools slow them down.
 
+[![Build Status](https://travis-ci.org/chrismdp/p.svg)](https://travis-ci.org/chrismdp/p)
+
 `p` is the fastest pomodoro tool you've ever used. It uses a simple tracking log file (`~/.p.log` by default) to keep track of your pomodoros and record simple statistics. It's less than 150 lines of pure Shell.
 
 ![demo](https://raw.githubusercontent.com/chrismdp/p/master/demo.gif)
