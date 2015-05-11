@@ -98,7 +98,7 @@ case "$1" in
     NOW=$($DATE +"$DATE_FORMAT")
     echo $NOW,,${*:2} >> "$LOG"
     optionalDescription "${*:2}"
-    echo "Pomodoro started$ON_THING"
+    echo "Pomodoro started $ON_THING"
     ;;
   cancel | c)
     cancelRunningPomodoro "Cancelled. The next Pomodoro will go better!"

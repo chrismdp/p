@@ -32,7 +32,7 @@ function checkLog
 run 'p start'
 
 diff -u $OUTPUT - <<!
-Pomodoro started
+Pomodoro started 
 !
 
 [ $? -eq 0 ] || fail
