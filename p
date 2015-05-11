@@ -84,6 +84,13 @@ function optionalDescription
   fi
 }
 
+function displayLine
+{
+  MIN=$(($1 / 60))
+  SEC=$(($1 % 60))
+  optionalDescription "$3"
+  printf "$2$ON_THING" $MIN $SEC
+}
 
 case "$1" in
   start | s)
@@ -110,7 +117,7 @@ case "$1" in
         MIN=$((REMAINING / 60))
         SEC=$((REMAINING % 60))
         optionalDescription "${THING}"
-        printf "\r$PREFIX ${MIN}:${SEC}$ON_THING "
+        displayLine $REMAINING "\r$PREFIX %02d:%02d " "$THING"
         sleep 1
         checkLastPomodoro
         if [ ! -z "${*:2}" ]; then
@@ -148,20 +155,14 @@ case "$1" in
       if [ ! -z $POMODORO_FINISHED ]; then
         BREAK=$((SECONDS_ELAPSED - POMODORO_LENGTH_IN_SECONDS))
         if (( $BREAK < $POMODORO_BREAK_IN_SECONDS )); then
-          MIN=$((BREAK / 60))
-          SEC=$((BREAK % 60))
-          optionalDescription "${THING}"
-          echo "$PREFIX Completed ${MIN}:${SEC} ago$ON_THING"
+          displayLine $BREAK "$PREFIX Completed %02d:%02d ago\n" "$THING"
         else
           LAST=$(convertTimeFormat "$TIME" "+%a, %d %b %Y %T")
           echo "Most recent pomodoro: $LAST"
         fi
       else
         REMAINING=$((POMODORO_LENGTH_IN_SECONDS - SECONDS_ELAPSED))
-        MIN=$((REMAINING / 60))
-        SEC=$((REMAINING % 60))
-        optionalDescription "${THING}"
-        echo "$PREFIX ${MIN}:${SEC}$ON_THING"
+        displayLine $REMAINING "$PREFIX %02d:%02d\n" "$THING"
       fi
     fi
     ;;
