@@ -19,6 +19,8 @@ chmod +x ~/bin/p
 
 ## Usage
 
+### Controlling the Pomodoro
+
 To start a pomodoro:
 
 ```
@@ -40,6 +42,8 @@ $ p cancel
 Cancelled. Don't worry: the next Pomodoro will go better!
 ```
 
+### Monitoring the Pomodoro
+
 To play a ringing sound (or do any other action) at the end of a pomodoro use a command such as this:
 
 ```
@@ -51,6 +55,22 @@ $ p wait && afplay ring.wav
 🍅 00:00 on "Doing stuff" completed. Well done!
 
 ```
+
+To run a script each second you are waiting (to play a ticking sound, for example), pass the command as following arguments to wait:
+
+```
+$ p wait afplay tick.wav && afplay ring.wav
+```
+
+This command will be run as a seperate process, and started every second. Make sure that it finishes in a timely fashion!
+
+Here are some example sounds you might like:
+
+http://www.freesound.org/people/DrMinky/sounds/174721/
+http://www.freesound.org/people/jorickhoofd/sounds/160052/
+http://www.freesound.org/people/Benboncan/sounds/77695/
+
+### Producing statistics
 
 To look at your basic stats, type `p log` or have a look at your `~/.p.log` file. It's in a simple CSV format: 
 

@@ -113,6 +113,11 @@ case "$1" in
         printf "\r$PREFIX ${MIN}:${SEC}$ON_THING "
         sleep 1
         checkLastPomodoro
+        if [ ! -z "${*:2}" ]; then
+          (
+          ${*:2}
+          ) &
+        fi
       done
       echo " completed. Well done!"
     fi
