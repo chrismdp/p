@@ -45,6 +45,8 @@ function checkLastPomodoro
     SECONDS_ELAPSED=$((TIMESTAMP_NOW - TIMESTAMP_RECENT))
     if (( $SECONDS_ELAPSED >= $POMODORO_LENGTH_IN_SECONDS )); then
       POMODORO_FINISHED=1
+    else
+      POMODORO_FINISHED=0
     fi
   else
     NO_RECORDS=1
@@ -54,7 +56,7 @@ function checkLastPomodoro
 function cancelRunningPomodoro
 {
   checkLastPomodoro
-  if [ -z $POMODORO_FINISHED ]; then
+  if [ "$POMODORO_FINISHED" == "0" ]; then
     if [ -z $NO_RECORDS ]; then
       deleteLastLine
       echo $1
@@ -66,7 +68,7 @@ function interrupt
 {
   type=$1
   checkLastPomodoro
-  if [ -z $POMODORO_FINISHED ]; then
+  if [ "$POMODORO_FINISHED" == "0" ]; then
     deleteLastLine
     echo $TIME,$INTERRUPTIONS$type,$THING >> "$LOG"
     echo "Interrupt recorded"
@@ -92,13 +94,46 @@ function displayLine
   printf "$3" $MIN $SEC "$ON_THING"
 }
 
+function startPomodoro
+{
+  THING=$1
+  NOW=$($DATE +"$DATE_FORMAT")
+  echo "$NOW,,$THING" >> "$LOG"
+  optionalDescription "$THING"
+  echo "Pomodoro started $ON_THING"
+}
+
+function waitForCompletion
+{
+  REMAINING_ARGS="$1"
+  checkLastPomodoro
+  if [ "$POMODORO_FINISHED" == "0" ]; then
+    while [ "$POMODORO_FINISHED" == "0" ]; do
+      REMAINING=$((POMODORO_LENGTH_IN_SECONDS - SECONDS_ELAPSED))
+      MIN=$((REMAINING / 60))
+      SEC=$((REMAINING % 60))
+      displayLine $REMAINING "$THING" "\r$PREFIX %02d:%02d %s"
+      sleep 1
+      checkLastPomodoro
+      if [ ! -z "$REMAINING_ARGS" ]; then
+        (
+        $REMAINING_ARGS
+        ) &
+      fi
+    done
+    echo " completed. Well done!"
+  fi
+}
+
 case "$1" in
   start | s)
     cancelRunningPomodoro "Last Pomodoro cancelled"
-    NOW=$($DATE +"$DATE_FORMAT")
-    echo $NOW,,${*:2} >> "$LOG"
-    optionalDescription "${*:2}"
-    echo "Pomodoro started $ON_THING"
+    startPomodoro "${*:2}"
+    ;;
+  do | d)
+    cancelRunningPomodoro "Last Pomodoro cancelled"
+    startPomodoro "$2"
+    waitForCompletion "${*:3}"
     ;;
   cancel | c)
     cancelRunningPomodoro "Cancelled. The next Pomodoro will go better!"
@@ -110,23 +145,8 @@ case "$1" in
     interrupt $EXTERNAL_INTERRUPTION_MARKER
     ;;
   wait | w)
-    checkLastPomodoro
-    if [ -z $POMODORO_FINISHED ]; then
-      while [ -z $POMODORO_FINISHED ]; do
-        REMAINING=$((POMODORO_LENGTH_IN_SECONDS - SECONDS_ELAPSED))
-        MIN=$((REMAINING / 60))
-        SEC=$((REMAINING % 60))
-        displayLine $REMAINING "$THING" "\r$PREFIX %02d:%02d %s"
-        sleep 1
-        checkLastPomodoro
-        if [ ! -z "${*:2}" ]; then
-          (
-            ${*:2}
-          ) &
-        fi
-      done
-      echo " completed. Well done!"
-    fi
+    REMAINING_ARGS="${*:2}"
+    waitForCompletion "$REMAINING_ARGS"
     ;;
   log | l)
     cat "$LOG"
@@ -137,6 +157,7 @@ case "$1" in
     echo "Available commands:"
     echo "   status (default)    Shows information about the current pomodoro"
     echo "   start [description] Starts a new pomodoro, cancelling any in progress"
+    echo "   do ["desc"] [cmd]   Cancels & starts a new pomodoro, waiting until completion"
     echo "   cancel              Cancels any pomodoro in progress"
     echo "   internal            Records an internal interruption on current pomodoro"
     echo "   external            Records an external interruption on current pomodoro"
@@ -152,7 +173,7 @@ case "$1" in
   status | *)
     checkLastPomodoro
     if [ -z $NO_RECORDS ]; then
-      if [ ! -z $POMODORO_FINISHED ]; then
+      if [ "$POMODORO_FINISHED" == "1" ]; then
         BREAK=$((SECONDS_ELAPSED - POMODORO_LENGTH_IN_SECONDS))
         if (( $BREAK < $POMODORO_BREAK_IN_SECONDS )); then
           displayLine $BREAK "$THING" "$PREFIX Completed %02d:%02d ago %s\n"

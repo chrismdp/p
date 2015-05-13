@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/chrismdp/p.svg)](https://travis-ci.org/chrismdp/p)
 
-`p` is the fastest pomodoro tool you've ever used. It uses a simple tracking log file (`~/.p.log` by default) to keep track of your pomodoros and record simple statistics. It's less than 150 lines of pure Shell.
+`p` is the fastest pomodoro tool you've ever used. It uses a simple tracking log file (`~/.p.log` by default) to keep track of your pomodoros and record simple statistics. It's less than 200 lines of pure Shell.
 
 ![demo](https://raw.githubusercontent.com/chrismdp/p/master/demo.gif)
 
@@ -69,6 +69,15 @@ Here are some example sounds you might like:
 http://www.freesound.org/people/DrMinky/sounds/174721/
 http://www.freesound.org/people/jorickhoofd/sounds/160052/
 http://www.freesound.org/people/Benboncan/sounds/77695/
+
+To start a pomodoro and wait, use `p do`:
+
+```
+$ p do "my stuff" afplay tick.wav && afplay.ring.wav
+ast Pomodoro cancelled
+Pomodoro started on "stuff on stuff"
+🍅  24:59 on "stuff on stuff"
+```
 
 ### Producing statistics
 
