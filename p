@@ -37,9 +37,8 @@ function checkLastPomodoro
   if [ -s "$LOG" ]; then
     RECENT=$(tail -1 ${LOG})
     TIME=$(echo $RECENT | cut -d ',' -f 1)
-    THING=$(echo $RECENT | cut -d ',' -f 3-)
     INTERRUPTIONS=$(echo $RECENT | cut -d ',' -f 2)
-
+    THING=$(echo $RECENT | cut -d ',' -f 3-)
     TIMESTAMP_RECENT=$(convertTimeFormat "$TIME" "+%s")
     TIMESTAMP_NOW=$($DATE "+%s")
     SECONDS_ELAPSED=$((TIMESTAMP_NOW - TIMESTAMP_RECENT))
@@ -105,23 +104,41 @@ function startPomodoro
 
 function waitForCompletion
 {
-  REMAINING_ARGS="$1"
+  TICK_COMMAND="$1"
+  COMPLETED_COMMAND="$2"
   checkLastPomodoro
   if [ "$POMODORO_FINISHED" == "0" ]; then
     while [ "$POMODORO_FINISHED" == "0" ]; do
       REMAINING=$((POMODORO_LENGTH_IN_SECONDS - SECONDS_ELAPSED))
-      MIN=$((REMAINING / 60))
-      SEC=$((REMAINING % 60))
       displayLine $REMAINING "$THING" "\r$PREFIX %02d:%02d %s"
       sleep 1
       checkLastPomodoro
-      if [ ! -z "$REMAINING_ARGS" ]; then
-        (
-        $REMAINING_ARGS
-        ) &
+      if [ ! -z "$TICK_COMMAND" ]; then
+        ( $TICK_COMMAND ) &
       fi
     done
-    echo " completed. Well done!"
+    if [ ! -z "$COMPLETED_COMMAND" ]; then
+      ( $COMPLETED_COMMAND ) &
+    fi
+  fi
+}
+
+function showStatus
+{
+  checkLastPomodoro
+  if [ -z $NO_RECORDS ]; then
+    if [ "$POMODORO_FINISHED" == "1" ]; then
+      BREAK=$((SECONDS_ELAPSED - POMODORO_LENGTH_IN_SECONDS))
+      if (( $BREAK < $POMODORO_BREAK_IN_SECONDS )); then
+        displayLine $BREAK "$THING" "$PREFIX Completed %02d:%02d ago %s"
+      else
+        LAST=$(convertTimeFormat "$TIME" "+%a, %d %b %Y %T")
+        printf "Most recent pomodoro: $LAST"
+      fi
+    else
+      REMAINING=$((POMODORO_LENGTH_IN_SECONDS - SECONDS_ELAPSED))
+      displayLine $REMAINING "$THING" "$PREFIX %02d:%02d %s"
+    fi
   fi
 }
 
@@ -129,11 +146,6 @@ case "$1" in
   start | s)
     cancelRunningPomodoro "Last Pomodoro cancelled"
     startPomodoro "${*:2}"
-    ;;
-  do | d)
-    cancelRunningPomodoro "Last Pomodoro cancelled"
-    startPomodoro "$2"
-    waitForCompletion "${*:3}"
     ;;
   cancel | c)
     cancelRunningPomodoro "Cancelled. The next Pomodoro will go better!"
@@ -145,8 +157,16 @@ case "$1" in
     interrupt $EXTERNAL_INTERRUPTION_MARKER
     ;;
   wait | w)
-    REMAINING_ARGS="${*:2}"
-    waitForCompletion "$REMAINING_ARGS"
+    waitForCompletion "${*:2}" ""
+    ;;
+  loop)
+    while true; do
+      printf "\r                                                               "
+      waitForCompletion "$2" "$3"
+      printf "\r"
+      showStatus
+      sleep 1
+    done
     ;;
   log | l)
     cat "$LOG"
@@ -155,36 +175,23 @@ case "$1" in
     echo "usage: p [command]"
     echo
     echo "Available commands:"
-    echo "   status (default)    Shows information about the current pomodoro"
-    echo "   start [description] Starts a new pomodoro, cancelling any in progress"
-    echo "   do ["desc"] [cmd]   Cancels & starts a new pomodoro, waiting until completion"
-    echo "   cancel              Cancels any pomodoro in progress"
-    echo "   internal            Records an internal interruption on current pomodoro"
-    echo "   external            Records an external interruption on current pomodoro"
-    echo "   wait [command]      Prints ticking counter and blocks until pomodoro completion."
-    echo "                       Optionally runs 'command' every second"
-    echo "   log                 Shows pomodoro log output in CSV format"
-    echo "   help                Prints this help text"
+    echo "   status (default)         Shows information about the current pomodoro"
+    echo "   start [description]      Starts a new pomodoro, cancelling any in progress"
+    echo "   cancel                   Cancels any pomodoro in progress"
+    echo "   internal                 Records an internal interruption on current pomodoro"
+    echo "   external                 Records an external interruption on current pomodoro"
+    echo "   wait [command]           Prints ticking counter and blocks until pomodoro completion."
+    echo "                            Optionally runs 'command' every second"
+    echo "   loop <tick> <end>        Prints ticker and runs 'tick' every second and 'end' at"
+    echo "                            completion. Blocks until next pomodoro starts."
+    echo "   log                      Shows pomodoro log output in CSV format"
+    echo "   help                     Prints this help text"
     echo
-    echo "Commands may be shortened to their first letter. For more information"
+    echo "Most commands may be shortened to their first letter. For more information"
     echo "see http://github.com/chrismdp/p."
-    echo
     ;;
   status | *)
-    checkLastPomodoro
-    if [ -z $NO_RECORDS ]; then
-      if [ "$POMODORO_FINISHED" == "1" ]; then
-        BREAK=$((SECONDS_ELAPSED - POMODORO_LENGTH_IN_SECONDS))
-        if (( $BREAK < $POMODORO_BREAK_IN_SECONDS )); then
-          displayLine $BREAK "$THING" "$PREFIX Completed %02d:%02d ago %s\n"
-        else
-          LAST=$(convertTimeFormat "$TIME" "+%a, %d %b %Y %T")
-          echo "Most recent pomodoro: $LAST"
-        fi
-      else
-        REMAINING=$((POMODORO_LENGTH_IN_SECONDS - SECONDS_ELAPSED))
-        displayLine $REMAINING "$THING" "$PREFIX %02d:%02d %s\n"
-      fi
-    fi
+    showStatus
+    printf "\n"
     ;;
 esac

@@ -70,14 +70,15 @@ http://www.freesound.org/people/DrMinky/sounds/174721/
 http://www.freesound.org/people/jorickhoofd/sounds/160052/
 http://www.freesound.org/people/Benboncan/sounds/77695/
 
-To start a pomodoro and wait, use `p do`:
+### Continual monitoring
+
+To continually loop, running commands each second a pomodoro is running and each time one finishes, use `p loop`:
 
 ```
-$ p do "my stuff" afplay tick.wav && afplay.ring.wav
-ast Pomodoro cancelled
-Pomodoro started on "stuff on stuff"
-🍅  24:59 on "stuff on stuff"
+$ p loop "afplay tick.wav" "afplay ring.wav"
 ```
+
+Use Ctrl-C to quit this loop.
 
 ### Producing statistics
 
